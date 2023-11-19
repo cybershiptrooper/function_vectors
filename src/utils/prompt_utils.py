@@ -498,7 +498,7 @@ def load_dataset(task_name: str,
 
     d_group = list(filter(lambda x: x[1], d_group_map))
 
-    assert len(d_group) !=0 and len(d_group) == 1, f"Error! 'task_name'={task_name}.json must be uniquely contained in one of these directories:{data_folders}. Please check the root_data_dir"
+    assert len(d_group) !=0 and len(d_group) == 1, f"Error! 'task_name'={task_name}.json must be uniquely contained in one of these directories:{data_folders}. Please check the root_data_dir- {os.path.exists(path)}"
     dataset_folder = d_group[0][0]
     
     d_path = os.path.join(path, dataset_folder, f'{task_name}.json')

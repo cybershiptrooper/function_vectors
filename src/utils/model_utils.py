@@ -6,7 +6,7 @@ import random
 from typing import *
 
 
-def load_gpt_model_and_tokenizer(model_name:str, device='cuda'):
+def load_gpt_model_and_tokenizer(model_name:str, device='cpu'):
     """
     Loads a huggingface model and its tokenizer
 
@@ -90,6 +90,16 @@ def load_gpt_model_and_tokenizer(model_name:str, device='cuda'):
                       "name_or_path":model.config._name_or_path,
                       "attn_hook_names":[f'model.layers.{layer}.self_attn.o_proj' for layer in range(model.config.num_hidden_layers)],
                       "layer_hook_names":[f'model.layers.{layer}' for layer in range(model.config.num_hidden_layers)]}
+    elif "pythia" in model_name.lower():
+        model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float32).to(device)
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        tokenizer.pad_token = tokenizer.eos_token
+        MODEL_CONFIG={"n_heads":model.config.num_attention_heads,
+                            "n_layers":model.config.num_hidden_layers,
+                            "resid_dim": model.config.hidden_size,
+                            "name_or_path":model.config.name_or_path,
+                            "attn_hook_names":[f'gpt_neox.layers.{layer}.attention.dense' for layer in range(model.config.num_hidden_layers)],
+                            "layer_hook_names":[f'gpt_neox.layers.{layer}' for layer in range(model.config.num_hidden_layers)]}
     else:
         raise NotImplementedError("Still working to get this model available!")
 
